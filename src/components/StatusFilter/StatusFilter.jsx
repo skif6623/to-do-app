@@ -2,7 +2,7 @@ import { Button } from 'components/Button/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { setStatusFilter } from 'redux/actions';
 import { getStatusFilter } from 'redux/selectors';
-import { statusFilter } from 'redux/constants';
+import { statusFilters } from 'redux/constants';
 import css from './StatusFilter.module.css';
 
 export const StatusFilter = () => {
@@ -13,20 +13,20 @@ export const StatusFilter = () => {
   return (
     <div className={css.wrapper}>
       <Button
-        selected={filter === statusFilter.all}
-        onClick={() => handleFilterChange(statusFilter.all)}
+        selected={filter === statusFilters.all}
+        onClick={() => handleFilterChange(statusFilters.all)}
       >
         All
       </Button>
       <Button
-        selected={filter === statusFilter.active}
-        onClick={() => handleFilterChange(statusFilter.active)}
+        selected={filter === statusFilters.active}
+        onClick={() => handleFilterChange(statusFilters.active)}
       >
         Active
       </Button>
       <Button
-        selected={filter === statusFilter.completed}
-        onClick={() => handleFilterChange(statusFilter.completed)}
+        selected={filter === statusFilters.completed}
+        onClick={() => handleFilterChange(statusFilters.completed)}
       >
         Completed
       </Button>
