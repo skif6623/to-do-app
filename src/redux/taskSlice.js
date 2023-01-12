@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchTasks, addTask, deleteTask } from './operations';
+import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
 // import { nanoid } from 'nanoid';
 
 // [
@@ -40,7 +40,7 @@ const tasksSlice = createSlice({
     [addTask.fulfilled](state, action) {
       state.isLoading = false;
       state.error = null;
-      state.items.push(action.payload);
+      state.items.unshift(action.payload);
     },
     [addTask.rejected](state, action) {
       state.isLoading = false;
@@ -59,6 +59,22 @@ const tasksSlice = createSlice({
       state.items.splice(index, 1);
     },
     [deleteTask.rejected](state, action) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    // ЗМІНА СТАТУСУ
+    [toggleCompleted.pending](state) {
+      state.isLoading = true;
+    },
+    [toggleCompleted.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const index = state.items.findIndex(
+        task => task.id === action.payload.id
+      );
+      state.items.splice(index, 1, action.payload);
+    },
+    [toggleCompleted.rejected](state, action) {
       state.isLoading = false;
       state.error = action.payload;
     },
@@ -94,12 +110,5 @@ const tasksSlice = createSlice({
   //   },
   // },
 });
-
-export const {
-  toggleCompleted,
-  fetchingInProgress,
-  fetchingSuccess,
-  fetchingError,
-} = tasksSlice.actions;
 
 export const tasksReducer = tasksSlice.reducer;
