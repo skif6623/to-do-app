@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchTasks } from './operations';
-import { nanoid } from 'nanoid';
+import { fetchTasks, addTask, deleteTask } from './operations';
+// import { nanoid } from 'nanoid';
 
 // [
 //   { id: 0, text: 'Learn HTML and CSS', completed: true },
@@ -20,6 +20,7 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState: taskinitialState,
   extraReducers: {
+    // ЧИТАННЯ З БЕКУ
     [fetchTasks.pending](state) {
       state.isLoading = true;
     },
@@ -32,35 +33,73 @@ const tasksSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
-    // addTask: {
-    //   reducer(state, action) {
-    //     return [...state, action.payload];
-    //   },
-    //   prepare(text) {
-    //     return {
-    //       payload: {
-    //         text,
-    //         id: nanoid(),
-    //         completed: false,
-    //       },
-    //     };
-    //   },
-    // },
-    // deleteTask(state, action) {
-    //   return state.filter(task => task.id !== action.payload);
-    // },
-    // toggleCompleted(state, action) {
-    //   return state.map(task => {
-    //     if (task.id !== action.payload) {
-    //       return task;
-    //     }
-    //     return {
-    //       ...task,
-    //       completed: !task.completed,
-    //     };
-    //   });
-    // },
+    // ДОДАВАННЯ В БЕК
+    [addTask.pending](state) {
+      state.isLoading = true;
+    },
+    [addTask.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.items.push(action.payload);
+    },
+    [addTask.rejected](state, action) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    // ВИДАЛЕННЯ З БЕКУ
+    [deleteTask.pending](state) {
+      state.isLoading = true;
+    },
+    [deleteTask.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const index = state.items.findIndex(
+        task => task.id === action.payload.id
+      );
+      state.items.splice(index, 1);
+    },
+    [deleteTask.rejected](state, action) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
   },
+  // reducers: {
+  //   addTask: {
+  //     reducer(state, action) {
+  //       return [...state, action.payload];
+  //     },
+  //     prepare(text) {
+  //       return {
+  //         payload: {
+  //           text,
+  //           id: nanoid(),
+  //           completed: false,
+  //         },
+  //       };
+  //     },
+  //   },
+  //   deleteTask(state, action) {
+  //     return state.items.filter(task => task.id !== action.payload);
+  //   },
+  //   toggleCompleted(state, action) {
+  //     return state.map(task => {
+  //       if (task.id !== action.payload) {
+  //         return task;
+  //       }
+  //       return {
+  //         ...task,
+  //         completed: !task.completed,
+  //       };
+  //     });
+  //   },
+  // },
 });
-// export const { addTask, deleteTask, toggleCompleted, fetchingInProgress, fetchingSuccess, fetchingError } = tasksSlice.actions;
+
+export const {
+  toggleCompleted,
+  fetchingInProgress,
+  fetchingSuccess,
+  fetchingError,
+} = tasksSlice.actions;
+
 export const tasksReducer = tasksSlice.reducer;
