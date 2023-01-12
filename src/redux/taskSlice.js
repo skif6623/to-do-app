@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { fetchTasks } from './operations';
 import { nanoid } from 'nanoid';
 
 // [
@@ -18,48 +19,48 @@ const taskinitialState = {
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState: taskinitialState,
-  reducers: {
-    fetchingInProgress(state) {
+  extraReducers: {
+    [fetchTasks.pending](state) {
       state.isLoading = true;
     },
-    fetchingSuccess(state, action) {
+    [fetchTasks.fulfilled](state, action) {
       state.isLoading = false;
       state.error = null;
       state.items = action.payload;
     },
-    fetchingError(state, action) {
+    [fetchTasks.rejected](state, action) {
       state.isLoading = false;
       state.error = action.payload;
     },
-    addTask: {
-      reducer(state, action) {
-        return [...state, action.payload];
-      },
-      prepare(text) {
-        return {
-          payload: {
-            text,
-            id: nanoid(),
-            completed: false,
-          },
-        };
-      },
-    },
-    deleteTask(state, action) {
-      return state.filter(task => task.id !== action.payload);
-    },
-    toggleCompleted(state, action) {
-      return state.map(task => {
-        if (task.id !== action.payload) {
-          return task;
-        }
-        return {
-          ...task,
-          completed: !task.completed,
-        };
-      });
-    },
+    // addTask: {
+    //   reducer(state, action) {
+    //     return [...state, action.payload];
+    //   },
+    //   prepare(text) {
+    //     return {
+    //       payload: {
+    //         text,
+    //         id: nanoid(),
+    //         completed: false,
+    //       },
+    //     };
+    //   },
+    // },
+    // deleteTask(state, action) {
+    //   return state.filter(task => task.id !== action.payload);
+    // },
+    // toggleCompleted(state, action) {
+    //   return state.map(task => {
+    //     if (task.id !== action.payload) {
+    //       return task;
+    //     }
+    //     return {
+    //       ...task,
+    //       completed: !task.completed,
+    //     };
+    //   });
+    // },
   },
 });
-export const { addTask, deleteTask, toggleCompleted } = tasksSlice.actions;
+// export const { addTask, deleteTask, toggleCompleted, fetchingInProgress, fetchingSuccess, fetchingError } = tasksSlice.actions;
 export const tasksReducer = tasksSlice.reducer;
