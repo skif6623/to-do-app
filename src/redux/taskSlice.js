@@ -1,5 +1,5 @@
 // ПЕРЕПИСУЄМ РЕДЮСЕРИ В BUILDERNOTATION
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
 
 const taskinitialState = {
@@ -13,36 +13,15 @@ const tasksSlice = createSlice({
   initialState: taskinitialState,
   extraReducers: builder => {
     builder
-      .addCase(fetchTasks.pending, state => {
-        state.isLoading = true;
-      })
-      .addCase(fetchTasks.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
         state.items = action.payload;
       })
-      .addCase(addTask.pending, state => {
-        state.isLoading = true;
-      })
-      .addCase(addTask.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
       .addCase(addTask.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
         state.items.unshift(action.payload);
-      })
-      .addCase(deleteTask.pending, state => {
-        state.isLoading = true;
-      })
-      .addCase(deleteTask.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -52,13 +31,6 @@ const tasksSlice = createSlice({
         );
         state.items.splice(index, 1);
       })
-      .addCase(toggleCompleted.pending, state => {
-        state.isLoading = true;
-      })
-      .addCase(toggleCompleted.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
       .addCase(toggleCompleted.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
@@ -66,8 +38,32 @@ const tasksSlice = createSlice({
           task => task.id === action.payload.id
         );
         state.items.splice(index, 1, action.payload);
-      });
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchTasks.pending,
+          addTask.pending,
+          deleteTask.pending,
+          toggleCompleted.pending
+        ),
+        state => {
+          state.isLoading = true;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchTasks.rejected,
+          addTask.rejected,
+          deleteTask.rejected,
+          toggleCompleted.rejected
+        ),
+        (state, action) => {
+          state.isLoading = false;
+          state.error = action.payload;
+        }
+      );
   },
+
   // extraReducers: {
   //     // PENDING
   //     // REJECTED
