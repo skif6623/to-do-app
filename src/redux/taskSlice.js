@@ -2,6 +2,8 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
 
+const extraActions = [fetchTasks, addTask, deleteTask, toggleCompleted];
+
 const taskinitialState = {
   items: [],
   isLoading: false,
@@ -14,26 +16,18 @@ const tasksSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
         state.items = action.payload;
       })
       .addCase(addTask.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
         state.items.unshift(action.payload);
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
         const index = state.items.findIndex(
           task => task.id === action.payload.id
         );
         state.items.splice(index, 1);
       })
       .addCase(toggleCompleted.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
         const index = state.items.findIndex(
           task => task.id === action.payload.id
         );
@@ -41,10 +35,11 @@ const tasksSlice = createSlice({
       })
       .addMatcher(
         isAnyOf(
-          fetchTasks.pending,
-          addTask.pending,
-          deleteTask.pending,
-          toggleCompleted.pending
+          // fetchTasks.pending,
+          // addTask.pending,
+          // deleteTask.pending,
+          // toggleCompleted.pending
+          ...extraActions.map(action => action.pending)
         ),
         state => {
           state.isLoading = true;
@@ -52,14 +47,28 @@ const tasksSlice = createSlice({
       )
       .addMatcher(
         isAnyOf(
-          fetchTasks.rejected,
-          addTask.rejected,
-          deleteTask.rejected,
-          toggleCompleted.rejected
+          // fetchTasks.rejected,
+          // addTask.rejected,
+          // deleteTask.rejected,
+          // toggleCompleted.rejected
+          ...extraActions.map(action => action.rejected)
         ),
         (state, action) => {
           state.isLoading = false;
           state.error = action.payload;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          // fetchTasks.fulfilled,
+          // addTask.fulfilled,
+          // deleteTask.fulfilled,
+          // toggleCompleted.fulfilled
+          ...extraActions.map(action => action.fulfilled)
+        ),
+        state => {
+          state.isLoading = false;
+          state.error = null;
         }
       );
   },
