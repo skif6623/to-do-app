@@ -1,14 +1,6 @@
+// ПЕРЕПИСУЄМ РЕДЮСЕРИ В BUILDERNOTATION
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
-
-const handlePending = state => {
-  state.isLoading = true;
-};
-
-const handleRejected = (state, action) => {
-  state.isLoading = false;
-  state.error = action.payload;
-};
 
 const taskinitialState = {
   items: [],
@@ -19,49 +11,156 @@ const taskinitialState = {
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState: taskinitialState,
-  extraReducers: {
-    // PENDING
-    [fetchTasks.pending]: handlePending,
-    [addTask.pending]: handlePending,
-    [deleteTask.pending]: handlePending,
-    [toggleCompleted.pending]: handlePending,
-    // REJECTED
-    [fetchTasks.rejected]: handleRejected,
-    [addTask.rejected]: handleRejected,
-    [deleteTask.rejected]: handleRejected,
-    [toggleCompleted.rejected]: handleRejected,
-    // FULFILLED
-    [fetchTasks.fulfilled](state, action) {
-      state.isLoading = false;
-      state.error = null;
-      state.items = action.payload;
-    },
-    [addTask.fulfilled](state, action) {
-      state.isLoading = false;
-      state.error = null;
-      state.items.unshift(action.payload);
-    },
-    [deleteTask.fulfilled](state, action) {
-      state.isLoading = false;
-      state.error = null;
-      const index = state.items.findIndex(
-        task => task.id === action.payload.id
-      );
-      state.items.splice(index, 1);
-    },
-    [toggleCompleted.fulfilled](state, action) {
-      state.isLoading = false;
-      state.error = null;
-      const index = state.items.findIndex(
-        task => task.id === action.payload.id
-      );
-      state.items.splice(index, 1, action.payload);
-    },
-    [toggleCompleted.rejected](state, action) {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchTasks.pending, state => {
+        state.isLoading = true;
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.items = action.payload;
+      })
+      .addCase(addTask.pending, state => {
+        state.isLoading = true;
+      })
+      .addCase(addTask.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(addTask.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.items.unshift(action.payload);
+      })
+      .addCase(deleteTask.pending, state => {
+        state.isLoading = true;
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        const index = state.items.findIndex(
+          task => task.id === action.payload.id
+        );
+        state.items.splice(index, 1);
+      })
+      .addCase(toggleCompleted.pending, state => {
+        state.isLoading = true;
+      })
+      .addCase(toggleCompleted.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(toggleCompleted.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        const index = state.items.findIndex(
+          task => task.id === action.payload.id
+        );
+        state.items.splice(index, 1, action.payload);
+      });
   },
+  // extraReducers: {
+  //     // PENDING
+  //     // REJECTED
+  //     // FULFILLED
+  //
+  //     [deleteTask.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       const index = state.items.findIndex(
+  //         task => task.id === action.payload.id
+  //       );
+  //       state.items.splice(index, 1);
+  //     },
+  //     [toggleCompleted.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       const index = state.items.findIndex(
+  //         task => task.id === action.payload.id
+  //       );
+  //       state.items.splice(index, 1, action.payload);
+  //     },
+  //     [toggleCompleted.rejected](state, action) {
+  //       state.isLoading = false;
+  //       state.error = action.payload;
+  //     },
+  //   },
+  //
+  // ОБ'ЄКТНА ФОРМА РЕДЮСЕРІВ
+  // import { createSlice } from '@reduxjs/toolkit';
+  // import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
+
+  // const handlePending = state => {
+  //   state.isLoading = true;
+  // };
+
+  // const handleRejected = (state, action) => {
+  //   state.isLoading = false;
+  //   state.error = action.payload;
+  // };
+
+  // const taskinitialState = {
+  //   items: [],
+  //   isLoading: false,
+  //   error: null,
+  // };
+
+  // const tasksSlice = createSlice({
+  //   name: 'tasks',
+  //   initialState: taskinitialState,
+  //   extraReducers: {
+  //     // PENDING
+  //     [fetchTasks.pending]: handlePending,
+  //     [addTask.pending]: handlePending,
+  //     [deleteTask.pending]: handlePending,
+  //     [toggleCompleted.pending]: handlePending,
+  //     // REJECTED
+  //     [fetchTasks.rejected]: handleRejected,
+  //     [addTask.rejected]: handleRejected,
+  //     [deleteTask.rejected]: handleRejected,
+  //     [toggleCompleted.rejected]: handleRejected,
+  //     // FULFILLED
+  //     [fetchTasks.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       state.items = action.payload;
+  //     },
+  //     [addTask.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       state.items.unshift(action.payload);
+  //     },
+  //     [deleteTask.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       const index = state.items.findIndex(
+  //         task => task.id === action.payload.id
+  //       );
+  //       state.items.splice(index, 1);
+  //     },
+  //     [toggleCompleted.fulfilled](state, action) {
+  //       state.isLoading = false;
+  //       state.error = null;
+  //       const index = state.items.findIndex(
+  //         task => task.id === action.payload.id
+  //       );
+  //       state.items.splice(index, 1, action.payload);
+  //     },
+  //     [toggleCompleted.rejected](state, action) {
+  //       state.isLoading = false;
+  //       state.error = action.payload;
+  //     },
+  //   },
+  // Синхронні редюсери
   // reducers: {
   //   addTask: {
   //     reducer(state, action) {
