@@ -1,6 +1,15 @@
 // ПЕРЕПИСУЄМ РЕДЮСЕРИ В BUILDERNOTATION
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
+import {
+  fetchTasksFulfilledReducer,
+  addTaskFulfilledReducer,
+  deleteTaskFulfilledReducer,
+  toggleCompletedFulfilledReducer,
+  anyPendingReducer,
+  anyRejectedReducer,
+  anyFulfilledReducer,
+} from './taskSliceReducers';
 
 const extraActions = [fetchTasks, addTask, deleteTask, toggleCompleted];
 
@@ -17,46 +26,22 @@ const tasksSlice = createSlice({
   initialState: taskinitialState,
   extraReducers: builder => {
     builder
-      .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.items = action.payload;
-      })
-      .addCase(addTask.fulfilled, (state, action) => {
-        state.items.unshift(action.payload);
-      })
-      .addCase(deleteTask.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          task => task.id === action.payload.id
-        );
-        state.items.splice(index, 1);
-      })
-      .addCase(toggleCompleted.fulfilled, (state, action) => {
-        const index = state.items.findIndex(
-          task => task.id === action.payload.id
-        );
-        state.items.splice(index, 1, action.payload);
-      })
-      .addMatcher(
-        getActions('pending'),
-        state => {
-          state.isLoading = true;
-        }
-        // isAnyOf(
-        // fetchTasks.pending,
-        // addTask.pending,
-        // deleteTask.pending,
-        // toggleCompleted.pending
-        // ...extraActions.map(action => action.pending)
-        // ),
-      )
-      .addMatcher(getActions('rejected'), (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      .addMatcher(getActions('fulfilled'), state => {
-        state.isLoading = false;
-        state.error = null;
-      });
+      .addCase(fetchTasks.fulfilled, fetchTasksFulfilledReducer)
+      .addCase(addTask.fulfilled, addTaskFulfilledReducer)
+      .addCase(deleteTask.fulfilled, deleteTaskFulfilledReducer)
+      .addCase(toggleCompleted.fulfilled, toggleCompletedFulfilledReducer)
+      .addMatcher(getActions('pending'), anyPendingReducer)
+      .addMatcher(getActions('rejected'), anyRejectedReducer)
+      .addMatcher(getActions('fulfilled'), anyFulfilledReducer);
   },
+  // ПРИКЛАД БЕЗ СКОРОЧЕНЬ І ВИНЕСЕННЯ В ФУНКЦІЇ
+  // isAnyOf(
+  // fetchTasks.pending,
+  // addTask.pending,
+  // deleteTask.pending,
+  // toggleCompleted.pending
+  // ...extraActions.map(action => action.pending)
+  // ),
 
   // extraReducers: {
   //     // PENDING
