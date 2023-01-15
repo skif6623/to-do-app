@@ -4,6 +4,8 @@ import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
 
 const extraActions = [fetchTasks, addTask, deleteTask, toggleCompleted];
 
+const getActions = type => isAnyOf(...extraActions.map(action => action[type]));
+
 const taskinitialState = {
   items: [],
   isLoading: false,
@@ -34,43 +36,26 @@ const tasksSlice = createSlice({
         state.items.splice(index, 1, action.payload);
       })
       .addMatcher(
-        isAnyOf(
-          // fetchTasks.pending,
-          // addTask.pending,
-          // deleteTask.pending,
-          // toggleCompleted.pending
-          ...extraActions.map(action => action.pending)
-        ),
+        getActions('pending'),
         state => {
           state.isLoading = true;
         }
+        // isAnyOf(
+        // fetchTasks.pending,
+        // addTask.pending,
+        // deleteTask.pending,
+        // toggleCompleted.pending
+        // ...extraActions.map(action => action.pending)
+        // ),
       )
-      .addMatcher(
-        isAnyOf(
-          // fetchTasks.rejected,
-          // addTask.rejected,
-          // deleteTask.rejected,
-          // toggleCompleted.rejected
-          ...extraActions.map(action => action.rejected)
-        ),
-        (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload;
-        }
-      )
-      .addMatcher(
-        isAnyOf(
-          // fetchTasks.fulfilled,
-          // addTask.fulfilled,
-          // deleteTask.fulfilled,
-          // toggleCompleted.fulfilled
-          ...extraActions.map(action => action.fulfilled)
-        ),
-        state => {
-          state.isLoading = false;
-          state.error = null;
-        }
-      );
+      .addMatcher(getActions('rejected'), (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addMatcher(getActions('fulfilled'), state => {
+        state.isLoading = false;
+        state.error = null;
+      });
   },
 
   // extraReducers: {
